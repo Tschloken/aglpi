@@ -11,7 +11,7 @@ public class Callbacks {
 		 */
 		public void ok(int id, String name, String realname, String firstname, String session);
 		/**
-		 * Called chen there is an error
+		 * Called when there is an error
 		 */
 		public void error(String what);
 	}
