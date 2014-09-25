@@ -26,9 +26,10 @@ public class GlpiClient {
 	 * Calls the glpi.doLogin function. 
 	 * @param user The user login
 	 * @param password The user password
-	 * @param callback @see {@link Callbacks.OnLogin}
+	 * @param callback {@link Callbacks.OnLogin}
 	 */
 	void doLogin(String user, String password, final Callbacks.OnLogin callback) {
+		assert (callback != null);
 		XMLRPCMethod method = new XMLRPCMethod("glpi.doLogin", new XMLRPCMethodCallback() {
 			public void callFinished(Object result) {
 			HashMap<String, String> data = (HashMap<String, String>)(result);
@@ -46,6 +47,49 @@ public class GlpiClient {
 		method.call(new Object[]{(Object)params});
 	}
 	
+	/**
+	 * Log out of GLPI
+	 */
+	void doLogout() {
+		XMLRPCMethod method = new XMLRPCMethod("glpi.doLogout", new XMLRPCMethodCallback() {
+			public void callFinished(Object result) {
+			HashMap<String, String> data = (HashMap<String, String>)(result);
+				String message = data.get("message");
+				if (message.startsWith("Bye"))
+					; // OK
+			}
+        });
+	}
+	
+	/**
+	 * Retrieve a ticket
+	 * @param ticketId The glpi id for the ticket
+	 * @param callback {@link Callbacks.OnGetTicket}
+	 */
+	void getTicket(final int ticketId, final Callbacks.OnGetTicket callback) {
+		assert (callback != null);
+		XMLRPCMethod method = new XMLRPCMethod("glpi.doLogin", new XMLRPCMethodCallback() {
+			public void callFinished(Object result) {
+				@SuppressWarnings("unchecked")
+				HashMap<String, Object> data = (HashMap<String, Object>)(result);
+				if (data.get("id") != null) {
+					try {
+						Integer id = Integer.valueOf((String)data.get("id"));
+						if (id.intValue() != -1)
+							callback.ok(new Ticket(data));
+						else
+							callback.error("Could not get ticket with id " + ticketId);
+					} catch (NumberFormatException e) {
+						callback.error("Could not get ticket with id " + ticketId);
+					}
+				}
+			}
+        });
+		HashMap<String, String> params = new HashMap<String, String>();
+		params.put("ticked", String.valueOf(ticketId));
+		params.put("session", session);
+		method.call(new Object[]{(Object)params});
+	}
 	
 	interface XMLRPCMethodCallback {
 		void callFinished(Object result);

@@ -5,8 +5,12 @@ import java.util.HashMap;
 public class Ticket {
 	private HashMap<String, Object> data;
 	
-	public Ticket() {
+	public Ticket () {
 		this.data = new HashMap<String, Object>();
+	}
+	
+	public Ticket(HashMap<String, Object> data) {
+		this.data = data;
 	}
 	
 	void put(String field, Object value) {
