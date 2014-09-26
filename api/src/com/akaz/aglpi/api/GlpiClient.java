@@ -1,12 +1,15 @@
 package com.akaz.aglpi.api;
 
+import java.lang.reflect.Array;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.xmlrpc.android.XMLRPCClient;
 import org.xmlrpc.android.XMLRPCException;
 import org.xmlrpc.android.XMLRPCFault;
 
+import android.graphics.pdf.PdfDocument.Page;
 import android.os.Handler;
 import android.util.Log;
 
@@ -123,6 +126,31 @@ public class GlpiClient {
 		method.call(new Object[]{(Object)params});
 	}
 	
+	void listTickets(final Pagination pagination, final String orderBy, final Callbacks.OnListTickets callback) {
+		final List<Ticket> tickets = new LinkedList<Ticket>();
+		XMLRPCMethod method = new XMLRPCMethod("glpi.listTickets", new XMLRPCMethodCallback() {
+			public void callFinished(Object result) {
+				@SuppressWarnings("unchecked")
+				HashMap<String, Object>[] data = (HashMap<String, Object>[])(result);
+				for (HashMap<String, Object> row : data) {
+					tickets.add(new Ticket(row));
+				}
+				if (tickets.size() != 0)
+					callback.ok(tickets);
+				else
+					callback.error("No tickets received");
+			}
+        });
+		HashMap<String, String> params = new HashMap<String, String>();
+		params.put("order", orderBy);
+		params.put("count", String.valueOf(pagination.getCount()));
+		if (pagination.getLimit() != 1) {
+			params.put("start", String.valueOf(pagination.getStart()));
+			params.put("limit", String.valueOf(pagination.getLimit()));
+		}
+		params.put("session", session);
+		method.call(new Object[]{(Object)params});
+	}
 	
 	
 	interface XMLRPCMethodCallback {
