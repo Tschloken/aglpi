@@ -2,14 +2,14 @@ package com.akaz.aglpi.api;
 
 import java.util.HashMap;
 
-public class Ticket {
+public class Computer {
 	private HashMap<String, Object> data;
 	
-	public Ticket () {
+	public Computer () {
 		this.data = new HashMap<String, Object>();
 	}
 	
-	public Ticket(HashMap<String, Object> data) {
+	public Computer(HashMap<String, Object> data) {
 		this.data = data;
 	}
 	

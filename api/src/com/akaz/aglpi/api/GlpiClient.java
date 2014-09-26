@@ -1,6 +1,7 @@
 package com.akaz.aglpi.api;
 
 import java.util.HashMap;
+import java.util.List;
 
 import org.xmlrpc.android.XMLRPCClient;
 import org.xmlrpc.android.XMLRPCException;
@@ -68,7 +69,7 @@ public class GlpiClient {
 	 */
 	void getTicket(final int ticketId, final Callbacks.OnGetTicket callback) {
 		assert (callback != null);
-		XMLRPCMethod method = new XMLRPCMethod("glpi.doLogin", new XMLRPCMethodCallback() {
+		XMLRPCMethod method = new XMLRPCMethod("glpi.getTicket", new XMLRPCMethodCallback() {
 			public void callFinished(Object result) {
 				@SuppressWarnings("unchecked")
 				HashMap<String, Object> data = (HashMap<String, Object>)(result);
@@ -86,10 +87,43 @@ public class GlpiClient {
 			}
         });
 		HashMap<String, String> params = new HashMap<String, String>();
-		params.put("ticked", String.valueOf(ticketId));
+		params.put("ticket", String.valueOf(ticketId));
 		params.put("session", session);
 		method.call(new Object[]{(Object)params});
 	}
+	
+	/**
+	 * Retrieve a computer
+	 * @param computerId The glpi id of the computer to retrieve
+	 * @param callback {@link Callbacks.OnGetComputer}
+	 */
+	void getComputer(final int computerId, final Callbacks.OnGetComputer callback) {
+		assert (callback != null);
+		XMLRPCMethod method = new XMLRPCMethod("glpi.getObject", new XMLRPCMethodCallback() {
+			public void callFinished(Object result) {
+				@SuppressWarnings("unchecked")
+				HashMap<String, Object> data = (HashMap<String, Object>)(result);
+				if (data.get("id") != null) {
+					try {
+						Integer id = Integer.valueOf((String)data.get("id"));
+						if (id.intValue() != -1)
+							callback.ok(new Computer(data));
+						else
+							callback.error("Could not get computer with id " + computerId);
+					} catch (NumberFormatException e) {
+						callback.error("Could not get computer with id " + computerId);
+					}
+				}
+			}
+        });
+		HashMap<String, String> params = new HashMap<String, String>();
+		params.put("id", String.valueOf(computerId));
+		params.put("itemtype", "Computer");
+		params.put("session", session);
+		method.call(new Object[]{(Object)params});
+	}
+	
+	
 	
 	interface XMLRPCMethodCallback {
 		void callFinished(Object result);

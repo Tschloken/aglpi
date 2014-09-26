@@ -1,7 +1,8 @@
 package com.akaz.aglpi.api;
 
-public class Callbacks {
+import java.util.List;
 
+public class Callbacks {
 	/**
 	 * Callback for GlpiClient.doLogin()
 	 */
@@ -23,4 +24,21 @@ public class Callbacks {
 		public void ok(Ticket ticket);
 		public void error(String what);
 	}
+
+	/**
+	 * Callback for GlpiClient.getComputer()
+	 */
+	public interface OnGetComputer {
+		public void ok(Computer computer);
+		public void error(String what);
+	}
+	
+	/**
+	 * Callback for GlpiClient.listTickets()
+	 */
+	public interface OnListTickets {
+		public void ok(List<Ticket> tickets);
+		public void error(String what);
+	}
+
 }
