@@ -13,11 +13,11 @@ public class Ticket {
 		this.data = data;
 	}
 	
-	void put(String field, Object value) {
+	public void put(String field, Object value) {
 		this.data.put(field, value);
 	}
 	
-	Object get(String field) {
+	public Object get(String field) {
 		if (this.data.containsKey(field))
 			return this.data.get(field);
 		else

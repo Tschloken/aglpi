@@ -40,5 +40,13 @@ public class Callbacks {
 		public void ok(List<Ticket> tickets);
 		public void error(String what);
 	}
+	
+	/**
+	 * Callback for GlpiClient.listComputers()
+	 */
+	public interface OnListComputers {
+		public void ok(List<Computer> computers);
+		public void error(String what);
+	}
 
 }

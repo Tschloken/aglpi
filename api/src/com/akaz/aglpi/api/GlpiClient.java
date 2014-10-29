@@ -1,5 +1,6 @@
 package com.akaz.aglpi.api;
 
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -17,9 +18,12 @@ import android.util.Log;
  * Core class for the API
  */
 public class GlpiClient {
-	private XMLRPCClient		client;
-	private GlpiClientConfig	config;
-	private String				session;
+	private XMLRPCClient				client;
+	private GlpiClientConfig			config;
+	private String						session;
+	private HashMap<Integer, String>	computerModels;
+	private HashMap<Integer, String>	manufacturers;
+	private HashMap<Integer, String>	locations;
 	
 	public GlpiClient(GlpiClientConfig config) {
 		this.config = config;
@@ -32,13 +36,14 @@ public class GlpiClient {
 	 * @param password The user password
 	 * @param callback {@link Callbacks.OnLogin}
 	 */
-	void doLogin(String user, String password, final Callbacks.OnLogin callback) {
+	public void doLogin(String user, String password, final Callbacks.OnLogin callback) {
 		assert (callback != null);
 		XMLRPCMethod method = new XMLRPCMethod("glpi.doLogin", new XMLRPCMethodCallback() {
 			public void callFinished(Object result) {
 			HashMap<String, String> data = (HashMap<String, String>)(result);
 				session = data.get("session");
 				if (session != null) {
+					setupDropdowns();
 					callback.ok(Integer.parseInt(data.get("id")), data.get("name"), data.get("realname"), data.get("firstname"), session);
 				} else {
 					callback.error("Session not received");
@@ -52,9 +57,16 @@ public class GlpiClient {
 	}
 	
 	/**
+	 * @return True if the client is logged in
+	 */
+	public boolean isLoggedIn() {
+		return session != null;
+	}
+	
+	/**
 	 * Log out of GLPI
 	 */
-	void doLogout() {
+	public void doLogout() {
 		XMLRPCMethod method = new XMLRPCMethod("glpi.doLogout", new XMLRPCMethodCallback() {
 			public void callFinished(Object result) {
 			HashMap<String, String> data = (HashMap<String, String>)(result);
@@ -70,7 +82,7 @@ public class GlpiClient {
 	 * @param ticketId The glpi id for the ticket
 	 * @param callback {@link Callbacks.OnGetTicket}
 	 */
-	void getTicket(final int ticketId, final Callbacks.OnGetTicket callback) {
+	public void getTicket(final int ticketId, final Callbacks.OnGetTicket callback) {
 		assert (callback != null);
 		XMLRPCMethod method = new XMLRPCMethod("glpi.getTicket", new XMLRPCMethodCallback() {
 			public void callFinished(Object result) {
@@ -95,12 +107,37 @@ public class GlpiClient {
 		method.call(new Object[]{(Object)params});
 	}
 	
+	public void listTickets(final Pagination pagination, final String orderBy, final Callbacks.OnListTickets callback) {
+		final List<Ticket> tickets = new LinkedList<Ticket>();
+		XMLRPCMethod method = new XMLRPCMethod("glpi.listTickets", new XMLRPCMethodCallback() {
+			public void callFinished(Object result) {
+				@SuppressWarnings("unchecked")
+				HashMap<String, Object>[] data = (HashMap<String, Object>[])(result);
+				for (HashMap<String, Object> row : data) {
+					tickets.add(new Ticket(row));
+				}
+				if (tickets.size() != 0)
+					callback.ok(tickets);
+				else
+					callback.error("No tickets received");
+			}
+        });
+		HashMap<String, String> params = new HashMap<String, String>();
+		params.put("order", orderBy);
+		if (pagination.getLimit() != 1) {
+			params.put("start", String.valueOf(pagination.getStart()));
+			params.put("limit", String.valueOf(pagination.getLimit()));
+		}
+		params.put("session", session);
+		method.call(new Object[]{(Object)params});
+	}
+	
 	/**
 	 * Retrieve a computer
 	 * @param computerId The glpi id of the computer to retrieve
 	 * @param callback {@link Callbacks.OnGetComputer}
 	 */
-	void getComputer(final int computerId, final Callbacks.OnGetComputer callback) {
+	public void getComputer(final int computerId, final Callbacks.OnGetComputer callback) {
 		assert (callback != null);
 		XMLRPCMethod method = new XMLRPCMethod("glpi.getObject", new XMLRPCMethodCallback() {
 			public void callFinished(Object result) {
@@ -124,40 +161,134 @@ public class GlpiClient {
 		params.put("itemtype", "Computer");
 		params.put("session", session);
 		method.call(new Object[]{(Object)params});
-	}
 	
-	void listTickets(final Pagination pagination, final String orderBy, final Callbacks.OnListTickets callback) {
-		final List<Ticket> tickets = new LinkedList<Ticket>();
-		XMLRPCMethod method = new XMLRPCMethod("glpi.listTickets", new XMLRPCMethodCallback() {
+	}
+
+	/**
+	 * Retrieve a list of computers
+	 */
+	public void listComputers(final Pagination pagination, final Callbacks.OnListComputers callback) {
+		final List<Computer> computers = new LinkedList<Computer>();
+		XMLRPCMethod method = new XMLRPCMethod("glpi.listObjects", new XMLRPCMethodCallback() {
 			public void callFinished(Object result) {
 				@SuppressWarnings("unchecked")
-				HashMap<String, Object>[] data = (HashMap<String, Object>[])(result);
-				for (HashMap<String, Object> row : data) {
-					tickets.add(new Ticket(row));
+				Object[] data = (Object[])(result);
+				for (Object row : data) {
+					computers.add(new Computer((HashMap<String, Object>) row));
 				}
-				if (tickets.size() != 0)
-					callback.ok(tickets);
+				if (computers.size() != 0)
+					callback.ok(computers);
 				else
-					callback.error("No tickets received");
+					callback.error("No computers received");
 			}
         });
 		HashMap<String, String> params = new HashMap<String, String>();
-		params.put("order", orderBy);
-		params.put("count", String.valueOf(pagination.getCount()));
 		if (pagination.getLimit() != 1) {
 			params.put("start", String.valueOf(pagination.getStart()));
 			params.put("limit", String.valueOf(pagination.getLimit()));
 		}
+		params.put("itemtype", "Computer");
 		params.put("session", session);
 		method.call(new Object[]{(Object)params});
 	}
 	
+	public void setupDropdowns() {
+		setupComputerModelDropdown();
+	}
 	
-	interface XMLRPCMethodCallback {
+	private void setupComputerModelDropdown() {
+		computerModels = new HashMap<Integer, String>();
+		XMLRPCMethod method = new XMLRPCMethod("glpi.listDropdownValues", new XMLRPCMethodCallback() {
+			public void callFinished(Object result) {
+				@SuppressWarnings("unchecked")
+				Object[] data = (Object[])(result);
+				for (Object row : data) {
+					HashMap<String, String> r = (HashMap<String, String>) row;
+					computerModels.put(Integer.valueOf(r.get("id")), r.get("name"));
+				}
+				if (computerModels.size() != 0) 
+					Log.d("OK", "Downdown ComputerModels OK");
+				else
+					Log.d("NOK", "No ComputerModels Downdown received");
+				setupComputerManufacturerDropdown();
+			}
+        });
+		HashMap<String, String> params = new HashMap<String, String>();
+		params.put("dropdown", "ComputerModel");
+		params.put("session", session);
+		method.call(new Object[]{(Object)params});
+	}
+	
+	public HashMap<Integer, String> getComputerModelDropdown() {
+		return this.computerModels;
+	}
+	
+	private void setupComputerManufacturerDropdown() {
+		manufacturers = new HashMap<Integer, String>();
+		XMLRPCMethod method = new XMLRPCMethod("glpi.listDropdownValues", new XMLRPCMethodCallback() {
+			public void callFinished(Object result) {
+				@SuppressWarnings("unchecked")
+				Object[] data = (Object[])(result);
+				for (Object row : data) {
+					HashMap<String, String> r = (HashMap<String, String>) row;
+					manufacturers.put(Integer.valueOf(r.get("id")), r.get("name"));
+				}
+				if (manufacturers.size() != 0)
+					Log.d("OK", "Downdown Manufacturer OK");
+				else
+					Log.d("NOK", "No Manufacturer Downdown received");
+				setupLocationDropdown();
+			}
+        });
+		HashMap<String, String> params = new HashMap<String, String>();
+		params.put("dropdown", "Manufacturer");
+		params.put("session", session);
+		method.call(new Object[]{(Object)params});
+	}
+	
+	public HashMap<Integer, String> getManufacturerDropdown() {
+		return this.manufacturers;
+	}
+	
+	private void setupLocationDropdown() {
+		locations = new HashMap<Integer, String>();
+		XMLRPCMethod method = new XMLRPCMethod("glpi.listDropdownValues", new XMLRPCMethodCallback() {
+			public void callFinished(Object result) {
+				@SuppressWarnings("unchecked")
+				Object[] data = (Object[])(result);
+				for (Object row : data) {
+					HashMap<String, String> r = (HashMap<String, String>) row;
+					try {
+						locations.put(Integer.valueOf(r.get("id")), new String(r.get("name").getBytes("iso8859-1"), "UTF-8"));
+					} catch (NumberFormatException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (UnsupportedEncodingException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+				if (locations.size() != 0)
+					Log.d("OK", "Downdown Locations OK");
+				else
+					Log.d("NOK", "No Locations Downdown received");
+			}
+        });
+		HashMap<String, String> params = new HashMap<String, String>();
+		params.put("dropdown", "Location");
+		params.put("session", session);
+		method.call(new Object[]{(Object)params});
+	}
+	
+	public HashMap<Integer, String> getLocationDropdown() {
+		return this.locations;
+	}
+	
+	public interface XMLRPCMethodCallback {
 		void callFinished(Object result);
 	}
 	
-	class XMLRPCMethod extends Thread {
+	public class XMLRPCMethod extends Thread {
 		private String method;
 		private Object[] params;
 		private Handler handler;
