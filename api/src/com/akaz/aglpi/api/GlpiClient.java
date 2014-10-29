@@ -25,6 +25,9 @@ public class GlpiClient {
 	private HashMap<Integer, String>	manufacturers;
 	private HashMap<Integer, String>	locations;
 	
+	public static final String			TICKET_STATUS_NEW = "1";
+	public static final String			TICKET_STATUS_ASSIGN = "2";
+	
 	public GlpiClient(GlpiClientConfig config) {
 		this.config = config;
 		client = new XMLRPCClient(config.getWebserviceURI());
@@ -107,14 +110,25 @@ public class GlpiClient {
 		method.call(new Object[]{(Object)params});
 	}
 	
-	public void listTickets(final Pagination pagination, final String orderBy, final Callbacks.OnListTickets callback) {
+	/**
+	 * Liste tous les tickets selon les paramètres définis
+	 */
+	public void listTickets(final Pagination pagination, final String orderBy, final String status, final Callbacks.OnListTickets callback) {
 		final List<Ticket> tickets = new LinkedList<Ticket>();
 		XMLRPCMethod method = new XMLRPCMethod("glpi.listTickets", new XMLRPCMethodCallback() {
 			public void callFinished(Object result) {
-				@SuppressWarnings("unchecked")
+				/*
 				HashMap<String, Object>[] data = (HashMap<String, Object>[])(result);
 				for (HashMap<String, Object> row : data) {
 					tickets.add(new Ticket(row));
+				}
+				*/
+				for (Object row : (Object[])result) {
+					try {
+						tickets.add(new Ticket((HashMap<String, Object>)row));
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 				}
 				if (tickets.size() != 0)
 					callback.ok(tickets);
@@ -124,6 +138,7 @@ public class GlpiClient {
         });
 		HashMap<String, String> params = new HashMap<String, String>();
 		params.put("order", orderBy);
+		params.put("status", status);
 		if (pagination.getLimit() != 1) {
 			params.put("start", String.valueOf(pagination.getStart()));
 			params.put("limit", String.valueOf(pagination.getLimit()));
