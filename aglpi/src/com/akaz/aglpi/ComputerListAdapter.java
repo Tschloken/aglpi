@@ -20,14 +20,6 @@ public class ComputerListAdapter extends BaseAdapter{
 	private List<Computer>	computers;
 	private LayoutInflater	inflater;
 	
-    static class ViewHolder {
-    	ImageView	icon;
-    	TextView	title;
-    	TextView	dateTime;
-    	TextView	author;
-    	TextView	category;
-    }
-	
 	public ComputerListAdapter(Activity a, List<Computer> computers) {
 		assert (computers != null);
 		this.computers = computers;
