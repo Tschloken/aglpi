@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:ellipsize="end"
+        android:lines="1"
+        android:paddingTop="2dp"
+        android:text="Telle chose ne marche pas depuis samedi matin. "
+        android:textSize="20sp" />
+
+	<TextView
+	    android:id="@+id/date"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_alignParentLeft="true"
+	    android:layout_below="@+id/title"
+	    android:layout_marginLeft="16dp"
+	    android:text="29-10-2014 08:07" />
+
+	<TextView
+	    android:id="@+id/requester"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_alignBaseline="@+id/date"
+	    android:layout_alignParentRight="true"
+	    android:layout_marginRight="5dp"
+	    android:text="Prénom NOM" />
+
+</RelativeLayout>

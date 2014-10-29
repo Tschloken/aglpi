@@ -19,7 +19,7 @@ import com.akaz.aglpi.api.GlpiClientConfig;
 public class MainActivity extends ActionBarActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 	public static final int SECTION_COMPUTERS_LIST = 0;
-	public static final int SECTION_TICKETS_LIST = 0;
+	public static final int SECTION_TICKETS_LIST = 1;
 	static GlpiClient	glpi = null;
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
@@ -59,10 +59,14 @@ public class MainActivity extends ActionBarActivity
 
     @Override
     public void onNavigationDrawerItemSelected(int position) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
     	if (position == SECTION_COMPUTERS_LIST) {
-	        FragmentManager fragmentManager = getSupportFragmentManager();
 	        fragmentManager.beginTransaction()
 	                .replace(R.id.container, new ComputerListFragment())
+	                .commit();
+    	} else if (position == SECTION_TICKETS_LIST) {
+	        fragmentManager.beginTransaction()
+	                .replace(R.id.container, new TicketListFragment())
 	                .commit();
     	}
     }
@@ -72,7 +76,7 @@ public class MainActivity extends ActionBarActivity
             case SECTION_COMPUTERS_LIST:
                 mTitle = getString(R.string.section_computers);
                 break;
-            case 2:
+            case SECTION_TICKETS_LIST:
                 mTitle = getString(R.string.section_tickets);
                 break;
                 /*
