@@ -124,11 +124,8 @@ public class GlpiClient {
 				}
 				*/
 				for (Object row : (Object[])result) {
-					try {
-						tickets.add(new Ticket((HashMap<String, Object>)row));
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
+					HashMap<String, Object> mapRow = (HashMap<String, Object>)row;
+					tickets.add(new Ticket(mapRow));
 				}
 				if (tickets.size() != 0)
 					callback.ok(tickets);
@@ -139,6 +136,7 @@ public class GlpiClient {
 		HashMap<String, String> params = new HashMap<String, String>();
 		params.put("order", orderBy);
 		params.put("status", status);
+		params.put("id2name", "true");
 		if (pagination.getLimit() != 1) {
 			params.put("start", String.valueOf(pagination.getStart()));
 			params.put("limit", String.valueOf(pagination.getLimit()));
