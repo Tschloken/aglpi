@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingRight="5dp"
+    android:paddingLeft="5dp"
+    android:paddingTop="5dp" >
+
+    <ImageView
+        android:id="@+id/typeImage"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:scaleType="fitCenter"
+        android:src="@drawable/computer" />
+
+    <TextView
+        android:id="@+id/name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:text="NAME"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/manufacturer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/typeImage"
+        android:layout_marginRight="5dp"
+        android:layout_toLeftOf="@+id/typeImage"
+        android:lines="1"
+        android:text="Marque"
+        android:textStyle="italic" />
+
+    <TextView
+        android:id="@+id/model"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/manufacturer"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_toLeftOf="@+id/typeImage"
+        android:lines="1"
+        android:text="Modèle"
+        android:textStyle="italic" />
+    
+     <TextView
+        android:id="@+id/label_location"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@id/typeImage"
+        android:textStyle="bold" 
+        android:text="Lieu" />
+    
+    <TextView
+        android:id="@+id/location"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/uuid"
+        android:layout_below="@+id/label_location"
+        android:text="Informatique" />
+        
+    <TextView
+        android:id="@+id/label_user"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_marginTop="5dp"
+        android:layout_below="@id/location"
+        android:textStyle="bold" 
+        android:text="Usager" />
+    
+    <TextView
+        android:id="@+id/user"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/uuid"
+        android:layout_below="@+id/label_user"
+        android:text="admin@ADMIN-EC" />
+    
+    <TextView
+        android:id="@+id/label_serial"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_marginTop="5dp"
+        android:layout_below="@id/user"
+        android:textStyle="bold" 
+        android:text="N° de série" />
+    
+    <TextView
+        android:id="@+id/serial"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/uuid"
+        android:layout_below="@+id/label_serial"
+        android:text="CZC22584QN" />
+    
+    <TextView
+        android:id="@+id/label_uuid"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/name"
+        android:layout_below="@+id/serial"
+        android:text="UUID"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/uuid"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/label_uuid"
+        android:layout_below="@+id/label_uuid"
+        android:layout_marginLeft="14dp"
+        android:text="77ABFAE0-969B-11E1-9E71-E0E1E1AA3C2B" />
+
+    <TextView
+        android:id="@+id/label_os_serial"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/label_uuid"
+        android:layout_below="@+id/uuid"
+        android:layout_marginTop="5dp"
+        android:text="N° de série du Système d&apos;exploitation"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/os_serial"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/uuid"
+        android:layout_below="@+id/label_os_serial"
+        android:text="74T2M-DKDBC-788W3-H689G-6P6GT" />
+
+    <TextView
+        android:id="@+id/label_os_productid"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/label_os_serial"
+        android:layout_below="@+id/os_serial"
+        android:layout_marginTop="5dp"
+        android:text="Product ID du système d&apos;exploitation "
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/os_productid"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/os_serial"
+        android:layout_below="@+id/label_os_productid"
+        android:text="00371-OEM-8992671-00008" />
+
+       <TextView
+        android:id="@+id/label_last_modified"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/label_os_serial"
+        android:layout_below="@+id/os_productid"
+        android:layout_marginTop="5dp"
+        android:text="Dernière modification"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/last_modified"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/os_serial"
+        android:layout_below="@+id/label_last_modified"
+        android:text="2014-08-25 10:28:00" />
+
+</RelativeLayout>
